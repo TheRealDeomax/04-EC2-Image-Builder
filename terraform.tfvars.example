@@ -1,0 +1,31 @@
+# Example Terraform Variables Configuration
+# Copy this file to terraform.tfvars and customize as needed
+
+# AWS Region (change as needed)
+aws_region = "us-east-1"
+
+# Environment
+environment = "dev"
+
+# Instance types for Image Builder (can use multiple for testing)
+instance_types = ["t3.medium"]
+
+# Project name
+project_name = "web-server-imagebuilder"
+
+# Parent image ARN - Amazon Linux 2023
+# Update this ARN based on your region and latest version
+# To find the latest ARN, go to EC2 Image Builder console > Images > AWS Images
+parent_image = "arn:aws:imagebuilder:us-east-1:aws:image/amazon-linux-2023-x86/x.x.x"
+
+# Optional: Uncomment and set if you want SSH access to launched instances
+# key_pair_name = "my-key-pair"
+
+# Optional: Uncomment to enable Auto Scaling Group
+# create_auto_scaling = true
+# asg_min_size = 1
+# asg_max_size = 3
+# asg_desired_capacity = 2
+
+# Optional: Uncomment if using with load balancer
+# target_group_arns = ["arn:aws:elasticloadbalancing:region:account:targetgroup/my-targets/1234567890123456"]
