@@ -1,45 +1,45 @@
-# EC2 Image Builder for Amazon Linux with Web Server
+# EC2 Image Builder for Amazon Linux Web Server (Free Tier Optimized)
 
-This Terraform configuration creates an EC2 Image Builder pipeline that builds a custom Amazon Linux AMI with a pre-configured HTTP web service.
+This Terraform configuration creates an EC2 Image Builder pipeline that builds a custom Amazon Linux AMI with a pre-configured web server, optimized for AWS Free Tier usage.
 
 ## What This Creates
 
 ### Infrastructure Components
 - **IAM Roles and Policies**: Required roles for EC2 Image Builder service and instances
-- **Security Group**: Allows outbound traffic for Image Builder instances
-- **S3 Bucket**: Stores Image Builder logs with encryption and versioning
-- **VPC Configuration**: Uses the default VPC and subnets
+- **Security Group**: Allows HTTP/HTTPS traffic with proper egress rules
+- **Infrastructure Configuration**: Uses free tier eligible instance types (t3.micro, t2.micro)
 
 ### Image Builder Components
-- **Custom Component**: Installs and configures Apache HTTP server
-- **Image Recipe**: Combines the base Amazon Linux image with custom components
-- **Infrastructure Configuration**: Defines the build environment
+- **Custom Component**: Updates system, installs SSM agent, installs and configures Apache HTTP server
+- **Image Recipe**: Combines the base Amazon Linux 2023 image with custom components
+- **Infrastructure Configuration**: Defines the build environment with free tier instances
 - **Distribution Configuration**: Specifies how and where to distribute the built AMI
-- **Image Pipeline**: Orchestrates the entire build process
-- **Initial Image Build**: Triggers the first AMI build
+- **Image Pipeline**: Orchestrates the entire build process with testing enabled
 
 ## Features of the Built AMI
 
 The resulting AMI includes:
-- **Updated Amazon Linux 2023** with latest security patches
-- **Apache HTTP Server** pre-installed and configured
-- **Custom Welcome Page** with server information and real-time updates
-- **Health Check Endpoint** at `/health`
-- **Automatic Service Startup** - HTTP server starts automatically on boot
-- **Security Configuration** - Firewall rules configured for HTTP traffic
+- **Updated Amazon Linux 2023** with latest security patches using dnf package manager
+- **Amazon SSM Agent** pre-installed and configured for remote management
+- **Apache HTTP Server** pre-installed and configured to start automatically
+- **Beautiful Custom Web Application** with responsive design and server information
+- **Service Verification** - All services are tested during build process
+- **Free Tier Optimized** - Uses t3.micro/t2.micro instance types
 
-## Web Service Details
+## Web Application Details
 
-The AMI includes a beautiful, responsive web interface that displays:
-- Server status and information
-- Instance metadata (ID, current time)
-- Build information and components
-- Service health status
+The AMI includes a modern, responsive web interface that displays:
+- Server status and build information
+- Instance type and configuration details
+- List of installed features and services
+- Real-time build date and system information
+- Professional styling with AWS-inspired design
 
-The web service is accessible on port 80 and includes:
-- Main page at `/`
-- Health check endpoint at `/health`
-- Automatic service management via systemd
+The web service features:
+- Main page at `/` with full server information
+- Automatic service startup on boot
+- Apache HTTP server configured and tested
+- Proper file permissions and ownership
 
 ## Prerequisites
 
@@ -62,7 +62,8 @@ The web service is accessible on port 80 and includes:
    ```hcl
    aws_region = "us-east-1"  # Change to your preferred region
    environment = "dev"
-   instance_types = ["t3.medium"]
+   instance_types = ["t3.micro", "t2.micro"]  # Free tier eligible
+   parent_image = "arn:aws:imagebuilder:us-east-1:aws:image/amazon-linux-2023-x86/2023.3.20240306"
    ```
 
 3. **Initialize Terraform**:
