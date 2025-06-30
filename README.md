@@ -1,211 +1,271 @@
-# EC2 Image Builder for Amazon Linux Web Server (Free Tier Optimized)
+# EC2 Image Builder Pipeline - Complete Implementation
 
-This Terraform configuration creates an EC2 Image Builder pipeline that builds a custom Amazon Linux AMI with a pre-configured web server, optimized for AWS Free Tier usage.
+## 📋 Overview
 
-## What This Creates
+This Terraform configuration creates a complete EC2 Image Builder pipeline following AWS best practices and official documentation. It builds a custom Amazon Linux AMI with a web server, SSM agent, and all necessary security configurations.
 
-### Infrastructure Components
-- **IAM Roles and Policies**: Required roles for EC2 Image Builder service and instances
-- **Security Group**: Allows HTTP/HTTPS traffic with proper egress rules
-- **Infrastructure Configuration**: Uses free tier eligible instance types (t3.micro, t2.micro)
+## 🏗️ Architecture
 
-### Image Builder Components
-- **Custom Component**: Updates system, installs SSM agent, installs and configures Apache HTTP server
-- **Image Recipe**: Combines the base Amazon Linux 2023 image with custom components
-- **Infrastructure Configuration**: Defines the build environment with free tier instances
-- **Distribution Configuration**: Specifies how and where to distribute the built AMI
-- **Image Pipeline**: Orchestrates the entire build process with testing enabled
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                    EC2 Image Builder Pipeline                   │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                 │
+│  ┌─────────────────┐    ┌──────────────────┐    ┌─────────────┐ │
+│  │   Components    │    │   Image Recipe   │    │ Pipeline    │ │
+│  │                 │    │                  │    │             │ │
+│  │ • System Update │───▶│ • Base Image     │───▶│ • Build     │ │
+│  │ • SSM Agent     │    │ • Components     │    │ • Test      │ │
+│  │ • Web Server    │    │ • Configuration  │    │ • Distribute│ │
+│  └─────────────────┘    └──────────────────┘    └─────────────┘ │
+│                                                                 │
+│  ┌─────────────────┐    ┌──────────────────┐    ┌─────────────┐ │
+│  │ Infrastructure  │    │  Distribution    │    │   Outputs   │ │
+│  │                 │    │                  │    │             │ │
+│  │ • IAM Roles     │    │ • AMI Tags       │    │ • Custom    │ │
+│  │ • Security Grps │    │ • Target Regions │    │   AMI       │ │
+│  │ • Instance Types│    │ • Permissions    │    │ • Metadata  │ │
+│  └─────────────────┘    └──────────────────┘    └─────────────┘ │
+└─────────────────────────────────────────────────────────────────┘
+```
 
-## Features of the Built AMI
+## 🎯 What This Creates
 
-The resulting AMI includes:
-- **Updated Amazon Linux 2023** with latest security patches using dnf package manager
-- **Amazon SSM Agent** pre-installed and configured for remote management
-- **Apache HTTP Server** pre-installed and configured to start automatically
-- **Beautiful Custom Web Application** with responsive design and server information
-- **Service Verification** - All services are tested during build process
-- **Free Tier Optimized** - Uses t3.micro/t2.micro instance types
+### Core Infrastructure
+- **IAM Roles & Policies**: Proper permissions for Image Builder service and instances
+- **Security Groups**: Network access controls for build instances
+- **S3 Bucket**: Secure storage for build logs (optional)
 
-## Web Application Details
+### Image Builder Resources
+- **3 Custom Components**: System updates, SSM agent, web server
+- **Image Recipe**: Combines base Amazon Linux 2023 with custom components
+- **Infrastructure Configuration**: Defines build environment and instance types
+- **Distribution Configuration**: Specifies AMI creation and tagging
+- **Image Pipeline**: Orchestrates the entire build process
 
-The AMI includes a modern, responsive web interface that displays:
-- Server status and build information
-- Instance type and configuration details
-- List of installed features and services
-- Real-time build date and system information
-- Professional styling with AWS-inspired design
+### Built AMI Features
+- ✅ **Latest Amazon Linux 2023** with security updates
+- ✅ **Amazon SSM Agent** for remote management
+- ✅ **Apache HTTP Server** with auto-start configuration
+- ✅ **Modern Web Application** with responsive design
+- ✅ **Health Check Endpoints** for monitoring
+- ✅ **Comprehensive Testing** during build process
 
-The web service features:
-- Main page at `/` with full server information
-- Automatic service startup on boot
-- Apache HTTP server configured and tested
-- Proper file permissions and ownership
+## 🚀 Quick Start
 
-## Prerequisites
+### Prerequisites
+1. **AWS CLI** configured with appropriate credentials
+2. **Terraform** installed (version >= 1.0)
+3. **Appropriate AWS permissions** (see permissions section below)
 
-1. **AWS CLI configured** with appropriate credentials
-2. **Terraform installed** (version >= 1.0)
-3. **AWS permissions** for:
-   - EC2 Image Builder
-   - IAM roles and policies
-   - S3 bucket operations
-   - VPC and security group management
+### Deployment Steps
 
-## Quick Start
-
-1. **Clone and navigate to the directory**:
-   ```bash
-   cd "04 EC2 Image Builder"
-   ```
-
-2. **Review and modify variables** in `terraform.tfvars`:
-   ```hcl
-   aws_region = "us-east-1"  # Change to your preferred region
-   environment = "dev"
-   instance_types = ["t3.micro", "t2.micro"]  # Free tier eligible
-   parent_image = "arn:aws:imagebuilder:us-east-1:aws:image/amazon-linux-2023-x86/2023.3.20240306"
-   ```
-
-3. **Initialize Terraform**:
+1. **Initialize Terraform**:
    ```bash
    terraform init
    ```
 
-4. **Plan the deployment**:
+2. **Review Configuration**:
    ```bash
    terraform plan
    ```
 
-5. **Apply the configuration**:
+3. **Deploy Infrastructure**:
    ```bash
    terraform apply
    ```
 
-6. **Monitor the build process** in the AWS Console:
-   - Go to EC2 Image Builder
-   - Check the "Images" section for build progress
-   - Build typically takes 15-30 minutes
+4. **Start Image Build**:
+   - Go to AWS Console → EC2 Image Builder
+   - Navigate to "Image pipelines"
+   - Find your pipeline and click "Actions" → "Run pipeline"
+   - Monitor progress (typically 15-30 minutes)
 
-## Configuration Options
+5. **Test Your AMI**:
+   - Launch EC2 instance using the new AMI
+   - Access web application at `http://[instance-public-ip]`
 
-### Region Configuration
-Update the `aws_region` in `terraform.tfvars` and ensure the `parent_image` ARN matches your region.
+## ⚙️ Configuration
 
-### Instance Types
-Modify `instance_types` in `terraform.tfvars` to use different instance sizes for building.
+### Variables (`terraform.tfvars`)
 
-### Parent Image
-The configuration uses Amazon Linux 2023. To use a different base image:
-1. Find the appropriate ARN in the EC2 Image Builder console
-2. Update the `parent_image` variable
+```hcl
+# Basic Configuration
+aws_region   = "us-east-1"
+environment  = "dev"
+project_name = "web-server"
+
+# Instance Types (Free Tier Eligible)
+instance_types = ["t3.micro", "t2.micro"]
+
+# Base Image
+parent_image_arn = "arn:aws:imagebuilder:us-east-1:aws:image/amazon-linux-2023-x86/x.x.x"
+
+# Optional Features
+enable_logging  = true   # S3 logging
+enable_schedule = false  # Automated builds
+```
+
+### Customization Options
+
+#### Change Instance Types
+For faster builds (non-free tier):
+```hcl
+instance_types = ["t3.medium", "t3.large"]
+```
+
+#### Enable Scheduled Builds
+```hcl
+enable_schedule = true
+schedule_expression = "cron(0 2 * * sun)"  # Weekly on Sunday 2 AM
+```
+
+#### Different Base Image
+Find ARNs in EC2 Image Builder console:
+```hcl
+parent_image_arn = "arn:aws:imagebuilder:us-west-2:aws:image/ubuntu-server-20-lts-x86/x.x.x"
+```
+
+## 🔧 Components Details
+
+### 1. System Update Component
+- Updates all system packages using `dnf` (Amazon Linux 2023) or `yum`
+- Handles different Linux distributions automatically
+- Includes validation steps
+
+### 2. SSM Agent Component  
+- Installs latest Amazon SSM Agent
+- Configures automatic startup
+- Verifies service is running
+- Enables remote management capabilities
+
+### 3. Web Server Component
+- Installs Apache HTTP Server
+- Creates modern, responsive web application
+- Sets up health check endpoints
+- Configures proper file permissions
+- Tests all services during build
+
+## 🌐 Web Application Features
+
+The built AMI includes a professional web application:
+
+- **Modern Design**: Responsive layout with gradient background
+- **Server Information**: OS details, build date, installed features
+- **Status Dashboard**: Service health and system information
+- **Health Endpoints**: `/health.html` for monitoring
+- **Mobile Friendly**: Optimized for all screen sizes
+
+## 🔐 Security & Permissions
+
+### Required AWS Permissions
+Your AWS credentials need permissions for:
+- EC2 Image Builder (full access)
+- IAM (create roles and policies)
+- EC2 (security groups, instances)
+- S3 (bucket operations, if logging enabled)
+
+### Security Features
+- **Least Privilege IAM**: Minimal required permissions
+- **Network Security**: Restrictive security groups
+- **Encryption**: S3 bucket encryption enabled
+- **No SSH Access**: Uses SSM for secure remote access
+
+## 💰 Cost Considerations
+
+### Free Tier Eligible
+- **Build Instances**: t3.micro/t2.micro (750 hours/month free)
+- **S3 Storage**: 5GB free tier for logs
+- **Network**: Standard data transfer rates
+
+### Estimated Costs (if exceeding free tier)
+- **Build Instance**: ~$0.0104/hour (t3.micro)
+- **Build Duration**: 15-30 minutes per build
+- **Storage**: AMI snapshots (~$0.05/GB/month)
+
+## 📊 Monitoring & Troubleshooting
+
+### Build Monitoring
+1. **AWS Console**: EC2 Image Builder → Images
+2. **CloudWatch Logs**: Detailed build logs
+3. **S3 Logs**: Comprehensive build artifacts (if enabled)
+
+### Common Issues
+- **Build Failures**: Check CloudWatch logs for specific errors
+- **Permission Errors**: Verify IAM roles and policies
+- **Network Issues**: Check security group and VPC configuration
+- **Component Errors**: Review YAML syntax and command execution
+
+### Validation Steps
+Each component includes validation to ensure:
+- Services are running correctly
+- Dependencies are installed
+- Web application is accessible
+- Health checks pass
+
+## 🔄 Pipeline Workflow
+
+1. **Trigger**: Manual or scheduled execution
+2. **Launch**: EC2 instance with base AMI
+3. **Build**: Execute components in sequence:
+   - Update system packages
+   - Install and configure SSM Agent
+   - Install and configure web server
+4. **Test**: Run validation tests
+5. **Create**: Generate AMI with proper tags
+6. **Distribute**: Make AMI available in specified regions
+7. **Cleanup**: Terminate build instance
+
+## 📚 File Structure
+
+```
+├── main.tf              # Core infrastructure and Image Builder resources
+├── variables.tf         # Variable definitions with validation
+├── outputs.tf          # Output values and next steps
+├── terraform.tfvars    # Configuration values
+└── README.md           # This documentation
+```
+
+## 🎉 Success Indicators
+
+After successful deployment and build:
+
+1. ✅ **Pipeline Created**: Visible in EC2 Image Builder console
+2. ✅ **Build Completes**: Status shows "Available"
+3. ✅ **AMI Generated**: Custom AMI appears in EC2 AMIs
+4. ✅ **Web App Works**: Accessible at instance public IP
+5. ✅ **SSM Connected**: Instance appears in Systems Manager
+
+## 🔧 Advanced Usage
 
 ### Custom Components
-The web server component is defined in `main.tf`. You can modify it to:
-- Install additional packages
-- Configure different web servers (nginx, etc.)
-- Add custom applications
-- Modify the welcome page
+Add your own components by creating additional `aws_imagebuilder_component` resources and including them in the recipe.
 
-## Build Pipeline
+### Multi-Region Distribution
+Modify the distribution configuration to include multiple regions:
 
-The pipeline includes:
-1. **System Updates**: Updates all packages to latest versions
-2. **Web Server Installation**: Installs Apache HTTP server
-3. **Content Creation**: Creates a custom welcome page
-4. **Service Configuration**: Enables and starts the web service
-5. **Security Setup**: Configures firewall rules
-6. **Health Checks**: Creates monitoring endpoints
-7. **Validation**: Tests that all services are working correctly
-
-## Scheduled Builds
-
-The pipeline is configured to run daily at 2 AM UTC when there are dependency updates available. You can modify the schedule in the `aws_imagebuilder_image_pipeline` resource.
-
-## Testing the Built AMI
-
-After the build completes:
-
-1. **Find your new AMI** in the EC2 console or use the build ARN from outputs
-2. **Launch an EC2 instance** using the built AMI
-3. **Ensure security group allows HTTP traffic** (port 80)
-4. **Access the web service** at `http://[instance-public-ip]`
-5. **Check health endpoint** at `http://[instance-public-ip]/health`
-
-## Monitoring and Logs
-
-- **Build logs** are stored in the created S3 bucket
-- **Build status** can be monitored in the EC2 Image Builder console
-- **CloudTrail** logs all Image Builder API calls
-
-## Cost Considerations
-
-- **Build instances** are terminated after each build
-- **S3 storage** for logs (minimal cost)
-- **AMI storage** in your account
-- **EC2 instances** launched from the AMI (separate cost)
-
-## Security Features
-
-- **IAM roles** follow least privilege principle
-- **S3 bucket** has encryption enabled
-- **Security groups** are restrictive
-- **System updates** are applied during build
-- **No SSH access** required (uses SSM for management)
-
-## Customization Examples
-
-### Adding Node.js
-Add to the component's build phase:
-```yaml
-- name: "InstallNodeJS"
-  action: "ExecuteBash"
-  inputs:
-    commands:
-      - "curl -fsSL https://rpm.nodesource.com/setup_lts.x | sudo bash -"
-      - "sudo yum install -y nodejs"
+```hcl
+distribution {
+  region = "us-east-1"
+  # ... ami configuration
+}
+distribution {
+  region = "us-west-2"  
+  # ... ami configuration
+}
 ```
 
-### Installing Docker
-Add to the component's build phase:
-```yaml
-- name: "InstallDocker"
-  action: "ExecuteBash"
-  inputs:
-    commands:
-      - "sudo yum install -y docker"
-      - "sudo systemctl enable docker"
-      - "sudo usermod -a -G docker ec2-user"
-```
+### Automated Testing
+Enable comprehensive testing with custom test components for your specific applications.
 
-## Troubleshooting
+## 📞 Support
 
-### Build Failures
-1. Check CloudWatch logs for the build
-2. Review S3 bucket logs
-3. Verify IAM permissions
-4. Check component syntax
+For issues or questions:
+1. Check AWS Image Builder documentation
+2. Review CloudWatch logs for build details
+3. Validate IAM permissions
+4. Ensure VPC and networking configuration
 
-### Network Issues
-1. Verify VPC and subnet configuration
-2. Check security group rules
-3. Ensure internet gateway is attached
+---
 
-### Component Issues
-1. Validate YAML syntax in components
-2. Test commands manually on a test instance
-3. Check for typos in file paths
-
-## Cleanup
-
-To destroy all resources:
-```bash
-terraform destroy
-```
-
-**Note**: This will delete all created resources including any built AMIs and their snapshots.
-
-## Additional Resources
-
-- [EC2 Image Builder Documentation](https://docs.aws.amazon.com/imagebuilder/)
-- [Terraform AWS Provider Documentation](https://registry.terraform.io/providers/hashicorp/aws/latest/docs)
-- [Amazon Linux 2023 User Guide](https://docs.aws.amazon.com/linux/al2023/)
+**🎯 This implementation follows AWS best practices and provides a solid foundation for automated AMI building with EC2 Image Builder.**

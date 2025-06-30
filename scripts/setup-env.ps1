@@ -1,7 +1,7 @@
-$env:TF_VAR_AWS_ACCESS_KEY_ID = "accesskeys"
-$env:TF_VAR_AWS_SECRET_ACCESS_KEY = "secretaccesskey"
+$env:TF_VAR_AWS_ACCESS_KEY_ID = "AKIA5MB3CNBU55FIXUGL"
+$env:TF_VAR_AWS_SECRET_ACCESS_KEY = "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"
 
-$env:AWS_ACCESS_KEY_ID = "accesskeys"
-$env:AWS_SECRET_ACCESS_KEY = "secretaccesskey"
+$env:AWS_ACCESS_KEY_ID = "AKIA5MB3CNBU55FIXUGL"
+$env:AWS_SECRET_ACCESS_KEY = "sh4lUIxs5BPgyVQQicJGl8myt30x8Z0+Z/6BxuSr"
 $env:AWS_DEFAULT_REGION = "us-east-1" # Replace with your desired region
 
