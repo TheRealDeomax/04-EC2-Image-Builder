@@ -75,6 +75,33 @@ resource "aws_iam_role_policy_attachment" "ssm_managed_instance_core" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
 }
 
+# Create custom policy for S3 logging access
+resource "aws_iam_role_policy" "imagebuilder_s3_logging_policy" {
+  count = var.enable_logging ? 1 : 0
+  name  = "${var.project_name}-imagebuilder-s3-logging-policy"
+  role  = aws_iam_role.imagebuilder_instance_role.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "s3:PutObject",
+          "s3:PutObjectAcl",
+          "s3:GetObject",
+          "s3:GetObjectAcl",
+          "s3:ListBucket"
+        ]
+        Resource = [
+          aws_s3_bucket.imagebuilder_logs[0].arn,
+          "${aws_s3_bucket.imagebuilder_logs[0].arn}/*"
+        ]
+      }
+    ]
+  })
+}
+
 # Create instance profile for the role
 resource "aws_iam_instance_profile" "imagebuilder_instance_profile" {
   name = "${var.project_name}-imagebuilder-instance-profile"
@@ -701,10 +728,6 @@ resource "aws_imagebuilder_distribution_configuration" "web_server_distribution"
       }
       
       # Ensure AMI is private - only accessible within the account
-      ami_permissions {
-        user_ids = []  # Empty list means no additional users
-        user_groups = []  # Empty list means no public access
-      }
     }
   }
 

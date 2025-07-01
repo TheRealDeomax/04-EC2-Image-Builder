@@ -72,5 +72,5 @@ variable "enable_schedule" {
 variable "schedule_expression" {
   description = "Cron expression for pipeline schedule (when enable_schedule is true)"
   type        = string
-  default     = "cron(0 2 * * sun)"  # Weekly on Sunday at 2 AM UTC
+  default     = "cron(0 2 * * sun)" # Weekly on Sunday at 2 AM UTC
 }

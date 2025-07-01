@@ -78,18 +78,18 @@ output "logs_bucket_name" {
 output "project_configuration" {
   description = "Project configuration summary"
   value = {
-    project_name    = var.project_name
-    environment     = var.environment
-    aws_region      = var.aws_region
-    instance_types  = var.instance_types
-    parent_image    = var.parent_image_arn
+    project_name   = var.project_name
+    environment    = var.environment
+    aws_region     = var.aws_region
+    instance_types = var.instance_types
+    parent_image   = var.parent_image_arn
   }
 }
 
 # Instructions
 output "next_steps" {
   description = "Instructions for next steps after deployment"
-  value = <<-EOT
+  value       = <<-EOT
     
     ========================================
     EC2 Image Builder Pipeline Deployed!

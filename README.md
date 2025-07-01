@@ -95,8 +95,8 @@ aws_region   = "us-east-1"
 environment  = "dev"
 project_name = "web-server"
 
-# Instance Types (Free Tier Eligible)
-instance_types = ["t3.micro", "t2.micro"]
+
+instance_types = ["t3.medium"]
 
 # Base Image
 parent_image_arn = "arn:aws:imagebuilder:us-east-1:aws:image/amazon-linux-2023-x86/x.x.x"
