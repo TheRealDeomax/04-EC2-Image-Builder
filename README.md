@@ -269,3 +269,39 @@ For issues or questions:
 ---
 
 **🎯 This implementation follows AWS best practices and provides a solid foundation for automated AMI building with EC2 Image Builder.**
+
+### Useful AWS CLI Commands
+
+```
+aws imagebuilder list-image-pipelines --query "imagePipelineList[*].[name,arn]" --output table
+aws imagebuilder list-image-pipelines --query "imagePipelineList[*].{Name:name,ARN:arn}"
+```
+Output examples:
+[
+    {
+        "Name": "web-server-web-server-pipeline",
+        "ARN": "arn:aws:imagebuilder:us-east-1:373211957869:image-pipeline/web-server-web-server-pipeline"
+    }
+]
+
+
+```
+aws imagebuilder list-workflow-executions --image-build-version-arn <ARN> --output json/table
+
+```
+
+```
+aws imagebuilder get-image --image-build-version-arn <arn> --query "image[*].imageRecipe[*].{name:name}
+
+```
+```
+aws imagebuilder list-image-build-versions --image-version-arn 
+```
+
+```
+aws imagebuilder start-image-pipeline-execution --image-pipeline-arn <arn resource name>
+```
+
+```
+aws ec2 describe-instances
+```
