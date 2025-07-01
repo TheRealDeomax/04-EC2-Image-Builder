@@ -687,7 +687,8 @@ resource "aws_imagebuilder_distribution_configuration" "web_server_distribution"
       name               = "${var.project_name}-web-server-{{ imagebuilder:buildDate }}"
       description        = "Amazon Linux web server with Apache and SSM Agent"
       target_account_ids = [data.aws_caller_identity.current.account_id]
-
+      
+      # Explicitly configure AMI permissions to prevent public sharing
       ami_tags = {
         Name         = "${var.project_name}-web-server"
         Environment  = var.environment
@@ -697,6 +698,12 @@ resource "aws_imagebuilder_distribution_configuration" "web_server_distribution"
         SSMAgent     = "Installed"
         CreatedBy    = "EC2-Image-Builder"
         Project      = var.project_name
+      }
+      
+      # Ensure AMI is private - only accessible within the account
+      ami_permissions {
+        user_ids = []  # Empty list means no additional users
+        user_groups = []  # Empty list means no public access
       }
     }
   }

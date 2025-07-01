@@ -49,7 +49,7 @@ variable "parent_image_arn" {
 variable "instance_types" {
   description = "List of EC2 instance types for Image Builder to use during build process"
   type        = list(string)
-  default     = ["t3.micro", "t2.micro"]
+  default     = ["t3.medium"]
   
   validation {
     condition = length(var.instance_types) > 0
